@@ -1,5 +1,5 @@
 
-let element = document.getElementById('message');
+const element = document.getElementById('message');
 
 element.textContent = window.context.get('data');
 

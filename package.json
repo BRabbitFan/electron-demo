@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A basic Electron application",
   "main": "src/main/index.js",
+  "type": "module",
   "scripts": {
     "start": "electron .",
     "build": "cmake-js compile",
@@ -16,5 +17,10 @@
     "cmake-js": "^7.3.0",
     "node-addon-api": "^8.0.0"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "imports": {
+    "#main/*": "./src/main/*",
+    "#renderer/*": "./src/renderer/*",
+    "#preload/*": "./src/preload/*"
+  }
 }

@@ -1,7 +1,12 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
-const path = require('path');
-const native = require('./native');
-const context = require('./context');
+import {app, BrowserWindow, ipcMain} from 'electron';
+import {join} from 'path';
+
+import context from '#main/context.js';
+import native from '#main/native.js';
+
+import.meta.resolve = function(modulePath) {
+  return new URL(modulePath, import.meta.url).pathname;
+}
 
 ipcMain.handle('context:get', (event, key) => {
   return context.get(key);
@@ -12,7 +17,7 @@ function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, '../preload/index.js'),
+      preload: join(import.meta.dirname, '../preload/index.js'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
@@ -21,7 +26,7 @@ function createWindow() {
 
   context.addListener(mainWindow);
 
-  mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
+  mainWindow.loadFile(join(import.meta.dirname, '../renderer/index.html'));
 
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.send('context:state-changed', context.getState());

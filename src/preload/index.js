@@ -11,5 +11,3 @@ contextBridge.exposeInMainWorld('context', {
     ipcRenderer.removeAllListeners('context:state-changed');
   }
 });
-
-console.log('[Preload] Context API exposed');
