@@ -3,8 +3,8 @@ import { createRequire } from 'module';
 import { join } from 'path';
 
 const require = createRequire(import.meta.url);
-const buildType = app.isPackaged || !process.env.DEBUG_NATIVE ? 'Release' : 'Debug';
-const addon = require(join(app.getAppPath(), `build/${buildType}/addon.node`));
+const CPP_BUILD_TYPE = process.env.DEBUG_NATIVE ? 'Debug' : 'Release';
+const addon = require(join(app.getAppPath(), `build/${CPP_BUILD_TYPE}/addon.node`));
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -21,6 +21,15 @@ function createWindow() {
   mainWindow.setMenuBarVisibility(false);
 
   mainWindow.loadFile(join(import.meta.dirname, '../renderer/index.html'));
+
+  if (app.isPackaged) {
+    mainWindow.webContents.on('before-input-event', (event, input) => {
+      // disable F12 and Ctrl+Shift+I to open DevTools in production
+      if (input.key === 'F12' || (input.control && input.shift && input.key === 'I')) {
+        event.preventDefault();
+      }
+    });
+  }
 
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.send('native:message', addon.GetHelloWorld());
