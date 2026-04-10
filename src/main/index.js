@@ -1,49 +1,40 @@
-import {app, BrowserWindow, ipcMain} from 'electron';
-import {join} from 'path';
+import { app, BrowserWindow } from 'electron';
+import { createRequire } from 'module';
+import { join } from 'path';
 
-import context from '#main/context.js';
-import native from '#main/native.js';
-
-import.meta.resolve = function(modulePath) {
-  return new URL(modulePath, import.meta.url).pathname;
-}
-
-ipcMain.handle('context:get', (event, key) => {
-  return context.get(key);
-});
+const require = createRequire(import.meta.url);
+const addon = require(join(app.getAppPath(), 'build/Release/addon.node'));
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    // titleBarStyle: 'hidden',
+    // titleBarOverlay: {
+    //   // color: '#2f3241',
+    //   // symbolColor: '#ffffff',
+    //   height: 32,
+    // },
     webPreferences: {
-      preload: join(import.meta.dirname, '../preload/index.js'),
+      preload: join(import.meta.dirname, '../preload/index.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
     }
   });
 
-  context.addListener(mainWindow);
+  mainWindow.setMenuBarVisibility(false);
 
   mainWindow.loadFile(join(import.meta.dirname, '../renderer/index.html'));
 
   mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow.webContents.send('context:state-changed', context.getState());
-  });
-
-  mainWindow.on('closed', () => {
-    context.removeListener(mainWindow);
+    mainWindow.webContents.send('native:message', addon.get_message());
   });
 
   return mainWindow;
 }
 
 app.whenReady().then(() => {
-  context.setState({
-    data: native.addon.get_message(),
-  });
-
   createWindow();
 
   app.on('activate', () => {

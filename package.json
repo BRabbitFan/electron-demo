@@ -2,22 +2,26 @@
   "name": "electron-demo",
   "version": "1.0.0",
   "description": "A basic Electron application",
-  "main": "src/main/index.js",
+  "author": "BRabbit",
+  "license": "MIT",
+  "keywords": [],
   "type": "module",
+  "main": "src/main/index.js",
   "scripts": {
     "start": "electron .",
     "build": "cmake-js compile",
     "rebuild": "cmake-js rebuild"
   },
-  "keywords": [],
-  "author": "BRabbit",
-  "license": "MIT",
   "devDependencies": {
     "electron": "^39.0.0",
     "cmake-js": "^7.3.0",
     "node-addon-api": "^8.0.0"
   },
   "dependencies": {},
+  "cmake-js": {
+    "runtime": "electron",
+    "runtimeVersion": "39.0.0"
+  },
   "imports": {
     "#main/*": "./src/main/*",
     "#renderer/*": "./src/renderer/*",

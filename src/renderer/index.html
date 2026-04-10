@@ -3,22 +3,36 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
   <title>Electron Demo</title>
   <style>
     body {
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100vh;
       margin: 0;
       font-family: Arial, sans-serif;
-      font-size: 48px;
+    }
+
+    #message {
+      font-size: 24px;
+      margin: 16px 0;
+    }
+
+    #glcanvas {
+      width: 640px;
+      height: 480px;
+      border: 1px solid #ccc;
     }
   </style>
 </head>
 
 <body>
   <h1 id="message">Loading...</h1>
+  <canvas id="glcanvas" width="640" height="480"></canvas>
   <script src="renderer.js"></script>
 </body>
 
