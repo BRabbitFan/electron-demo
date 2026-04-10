@@ -1,0 +1,38 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Node Launch",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+      "windows": {
+        "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd",
+      },
+      "args": [
+        ".",
+      ],
+      "env": {
+        "DEBUG_NATIVE": "1",
+      },
+      "outputCapture": "std",
+      "preLaunchTask": "compile debug native addons",
+    },
+    {
+      "name": "LLDB Attach",
+      "type": "lldb",
+      "request": "attach",
+      "pid": "${command:pickProcess}",
+    },
+  ],
+  "compounds": [
+    {
+      "name": "Node Launch & LLDB Attach",
+      "configurations": [
+        "Node Launch",
+        "LLDB Attach",
+      ],
+    },
+  ],
+}

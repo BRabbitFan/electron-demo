@@ -9,7 +9,7 @@ auto GetHelloWorld(const Napi::CallbackInfo& info) -> Napi::String {
 }
 
 auto Init(Napi::Env env, Napi::Object exports) -> Napi::Object {
-  exports.Set(Napi::String::New(env, "get_message"s), Napi::Function::New(env, GetHelloWorld));
+  exports.Set(Napi::String::New(env, "GetHelloWorld"s), Napi::Function::New(env, GetHelloWorld));
   return exports;
 }
 
