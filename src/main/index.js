@@ -2,12 +2,12 @@ import { app, BrowserWindow } from 'electron';
 import { createRequire } from 'module';
 import { join } from 'path';
 
-const require = createRequire(import.meta.url);
-const CPP_BUILD_TYPE = process.env.DEBUG_NATIVE ? 'Debug' : 'Release';
-const nativeApis = require(join(app.getAppPath(), `build/${CPP_BUILD_TYPE}/addon.node`));
-const nodeApis = require('./node-apis.js');
+import { nodeApis } from './node-apis.js';
 
-nativeApis.SetNodeApi(nodeApis.GetNodeApiVersion);
+const require = createRequire(import.meta.url);
+const nativeApis = require(join(app.getAppPath(), 'build/bin/native_apis.node'));
+
+nativeApis.SetNodeApis(...nodeApis);
 
 function createWindow() {
   const mainWindow = new BrowserWindow({

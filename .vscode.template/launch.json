@@ -8,30 +8,27 @@
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
       "windows": {
-        "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd",
+        "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
       },
       "args": [
-        ".",
+        "."
       ],
-      "env": {
-        "DEBUG_NATIVE": "1",
-      },
-      "outputCapture": "std",
+      "outputCapture": "std"
     },
     {
       "name": "LLDB Attach",
       "type": "lldb",
       "request": "attach",
-      "pid": "${command:pickProcess}",
-    },
+      "pid": "${command:pickProcess}"
+    }
   ],
   "compounds": [
     {
       "name": "Node Launch & LLDB Attach",
       "configurations": [
         "Node Launch",
-        "LLDB Attach",
-      ],
-    },
-  ],
+        "LLDB Attach"
+      ]
+    }
+  ]
 }

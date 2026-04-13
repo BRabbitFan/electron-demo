@@ -8,6 +8,10 @@
 using ApiMap = std::map<std::string, Napi::FunctionReference, std::less<>>;
 
 class NodeApiProxy final {
+  std::string_view name_;
+  ApiMap&          apis_;
+  ApiMap::iterator iter_;
+
  public:
   explicit NodeApiProxy(std::string_view name, ApiMap& apis) : name_{ name }, apis_{ apis }, iter_{ apis_.end() } {}
 
@@ -29,14 +33,11 @@ class NodeApiProxy final {
   auto operator->() -> Napi::FunctionReference* {
     return &visit();
   }
-
- private:
-  std::string_view name_;
-  ApiMap&          apis_;
-  ApiMap::iterator iter_;
 };
 
-inline class NodeApis final {
+inline class NodeApiTable final {
+  ApiMap apis_{};
+
  public:
   auto emplace(Napi::FunctionReference&& function) -> void {
     auto name = function.Value().Get("name").As<Napi::String>().Utf8Value();
@@ -45,12 +46,7 @@ inline class NodeApis final {
 
 #define NODE_API(name) NodeApiProxy name{ #name, apis_ }
   // ---------- real APIs declaration (begin) ----------
-
   NODE_API(GetNodeApiVersion);
-
   // ---------- real APIs declaration (end) ----------
 #undef NODE_API
-
- private:
-  ApiMap apis_{};
 } NODE_APIS;

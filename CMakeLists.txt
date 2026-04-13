@@ -1,10 +1,16 @@
 cmake_minimum_required(VERSION 3.28)
-project(addon)
+project(native_apis)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/bin)
+set(CMAKE_PDB_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/lib)
 
 execute_process(
   COMMAND node -p "require('node-addon-api').include"
@@ -15,26 +21,24 @@ execute_process(
 
 string(REPLACE "\"" "" NODE_ADDON_API_DIR ${NODE_ADDON_API_DIR})
 
+set(CPP_SOURCE_DIR_PATH ${CMAKE_SOURCE_DIR}/native)
+
 file(GLOB_RECURSE CPP_SOURCE_FILE_PATH_LIST
-  ${CMAKE_SOURCE_DIR}/native/*.c
-  ${CMAKE_SOURCE_DIR}/native/*.cc
-  ${CMAKE_SOURCE_DIR}/native/*.cpp
-  ${CMAKE_SOURCE_DIR}/native/*.cxx
+  ${CPP_SOURCE_DIR_PATH}/*.c
+  ${CPP_SOURCE_DIR_PATH}/*.cc
+  ${CPP_SOURCE_DIR_PATH}/*.cpp
+  ${CPP_SOURCE_DIR_PATH}/*.cxx
 )
 
 add_library(${PROJECT_NAME} SHARED
+  ${CMAKE_JS_SRC}
   ${CPP_SOURCE_FILE_PATH_LIST}
-)
-
-set_target_properties(${PROJECT_NAME} PROPERTIES
-  PREFIX ""
-  SUFFIX ".node"
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
   ${NODE_ADDON_API_DIR}
-  ${CMAKE_SOURCE_DIR}/native
   ${CMAKE_JS_INC}
+  ${CPP_SOURCE_DIR_PATH}
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
@@ -43,4 +47,15 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
   ${CMAKE_JS_LIB}
+)
+
+if(WIN32)
+  target_link_libraries(${PROJECT_NAME} PRIVATE
+    delayimp.lib
+  )
+endif()
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+  PREFIX ""
+  SUFFIX ".node"
 )

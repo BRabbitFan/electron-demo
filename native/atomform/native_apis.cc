@@ -1,5 +1,4 @@
 #include <format>
-#include <format>
 
 #include <napi-inl.h>
 #include <napi.h>
@@ -8,20 +7,17 @@
 
 using namespace std::literals;
 
-auto SetNodeApi(const Napi::CallbackInfo& info) -> Napi::Value {
-  auto env = info.Env();
-  if (info.Length() < 1 || !info[0].IsFunction()) {
-    Napi::TypeError::New(env, "Expected a function as argument"s).ThrowAsJavaScriptException();
-    return env.Null();
+auto SetNodeApis(const Napi::CallbackInfo& info) -> Napi::Value {
+  for (std::size_t index = 0; index < info.Length(); ++index) {
+    if (auto api = info[index]; api.IsFunction()) {
+      NODE_APIS.emplace(Napi::Persistent(api.As<Napi::Function>()));
+    }
   }
 
-  NODE_APIS.emplace(Napi::Persistent(info[0].As<Napi::Function>()));
-  return env.Null();
+  return info.Env().Undefined();
 }
 
 auto GetNativeApiVersion(const Napi::CallbackInfo& info) -> Napi::String {
-  Napi::Env env = info.Env();
-
   auto native_version = "v1.0.0"s;
 
   if (NODE_APIS.GetNodeApiVersion) {
@@ -30,28 +26,12 @@ auto GetNativeApiVersion(const Napi::CallbackInfo& info) -> Napi::String {
     }
   }
 
-  return Napi::String::New(env, native_version);
+  return Napi::String::New(info.Env(), native_version);
 }
 
 auto Init(Napi::Env env, Napi::Object exports) -> Napi::Object {
-
-  auto object = Napi::Object::New(env);
-  object.Set(Napi::String::New(env, "SetNodeApi"s), Napi::Function::New(env, SetNodeApi));
-  exports.Set(Napi::String::New(env, "af"s), object);
-
-  object.DefineProperties({
-    Napi::PropertyDescriptor::Function(env, object, "SetNodeApi"s, SetNodeApi),
-  });
-
-#define NATIVE_API(name) exports.Set(Napi::String::New(env, #name), Napi::Function::New(env, name))
-  // ---------- real APIs declaration (begin) ----------
-
-  NATIVE_API(SetNodeApi);
-  NATIVE_API(GetNativeApiVersion);
-
-  // ---------- real APIs declaration (end) ----------
-#undef NATIVE_API
-
+  exports.Set(Napi::String::New(env, "SetNodeApis"s), Napi::Function::New(env, SetNodeApis));
+  exports.Set(Napi::String::New(env, "GetNativeApiVersion"s), Napi::Function::New(env, GetNativeApiVersion));
   return exports;
 }
 

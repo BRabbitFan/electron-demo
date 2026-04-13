@@ -8,16 +8,40 @@
   "type": "module",
   "main": "src/main/index.js",
   "scripts": {
+    "native-configure-debug": "cmake-js configure --config=Debug --generator=Ninja --cc=clang --cxx=clang++",
+    "native-configure-relwithdebuginfo": "cmake-js configure --config=RelWithDebInfo --generator=Ninja --cc=clang --cxx=clang++",
+    "native-configure-release": "cmake-js configure --config=Release --generator=Ninja --cc=clang --cxx=clang++",
+    "native-reconfigure-debug": "cmake-js reconfigure --config=Debug --generator=Ninja --cc=clang --cxx=clang++",
+    "native-reconfigure-relwithdebuginfo": "cmake-js reconfigure --config=RelWithDebInfo --generator=Ninja --cc=clang --cxx=clang++",
+    "native-reconfigure-release": "cmake-js reconfigure --config=Release --generator=Ninja --cc=clang --cxx=clang++",
+    "native[windows]-configure-debug": "cmake-js configure --config=Debug --generator=Ninja --cc=clang-cl.exe --cxx=clang-cl.exe",
+    "native[windows]-configure-relwithdebuginfo": "cmake-js configure --config=RelWithDebInfo --generator=Ninja --cc=clang-cl.exe --cxx=clang-cl.exe",
+    "native[windows]-configure-release": "cmake-js configure --config=Release --generator=Ninja --cc=clang-cl.exe --cxx=clang-cl.exe",
+    "native[windows]-reconfigure-debug": "cmake-js reconfigure --config=Debug --generator=Ninja --cc=clang-cl.exe --cxx=clang-cl.exe",
+    "native[windows]-reconfigure-relwithdebuginfo": "cmake-js reconfigure --config=RelWithDebInfo --generator=Ninja --cc=clang-cl.exe --cxx=clang-cl.exe",
+    "native[windows]-reconfigure-release": "cmake-js reconfigure --config=Release --generator=Ninja --cc=clang-cl.exe --cxx=clang-cl.exe",
+    "native-build": "cmake --build ./build --target all",
     "start": "electron .",
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "pack-dir": "electron-builder --dir",
+    "pack-installer": "electron-builder"
   },
   "build": {
     "appId": "xyz.brabbit.electrondemo",
     "productName": "ElectronDemo",
     "files": [
       "src/**/*",
-      "build/Release/addon.node"
+      "build/bin/*.node"
+    ],
+    "extraFiles": [
+      {
+        "from": "build/bin/",
+        "to": ".",
+        "filter": [
+          "*.so",
+          "*.dylib",
+          "*.dll"
+        ]
+      }
     ],
     "extraResources": [],
     "linux": {
@@ -38,17 +62,21 @@
         "nsis",
         "zip"
       ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
     }
   },
   "devDependencies": {
-    "cmake-js": "^7.3.0",
-    "electron": "^39.0.0",
-    "electron-builder": "^26.8.1",
-    "node-addon-api": "^8.0.0"
+    "cmake-js": "^8.0.0",
+    "electron": "^41.2.0",
+    "electron-builder": "^26.8.2",
+    "node-addon-api": "^8.7.0"
   },
   "dependencies": {},
   "cmake-js": {
     "runtime": "electron",
-    "runtimeVersion": "39.0.0"
+    "runtimeVersion": "41.2.0"
   }
 }
