@@ -1,7 +1,7 @@
 const messageElement = document.getElementById('message');
 
 window.api.onMessage((message) => {
-  messageElement.textContent = message;
+  messageElement.textContent = "Native API Version: " + message;
 });
 
 // WebGL

@@ -4,7 +4,14 @@ import { join } from 'path';
 
 const require = createRequire(import.meta.url);
 const CPP_BUILD_TYPE = process.env.DEBUG_NATIVE ? 'Debug' : 'Release';
+
 const addon = require(join(app.getAppPath(), `build/${CPP_BUILD_TYPE}/addon.node`));
+
+function GetNodeApiVersion() {
+  return 'v1.0.0';
+}
+
+addon.SetNodeApi(GetNodeApiVersion);
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -32,7 +39,7 @@ function createWindow() {
   }
 
   mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow.webContents.send('native:message', addon.GetHelloWorld());
+    mainWindow.webContents.send('native:message', addon.GetNativeApiVersion());
   });
 
   return mainWindow;

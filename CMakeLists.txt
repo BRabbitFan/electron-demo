@@ -36,6 +36,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 
 target_include_directories(${PROJECT_NAME} PRIVATE
   ${NODE_ADDON_API_DIR}
+  ${CMAKE_SOURCE_DIR}/native
   ${CMAKE_JS_INC}
 )
 
