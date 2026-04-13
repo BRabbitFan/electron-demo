@@ -1,4 +1,4 @@
-# OS files
+# OS
 .DS_Store
 Thumbs.db
 
@@ -7,6 +7,7 @@ Thumbs.db
 .idea/
 
 # Electron
+dist/
 *.tgz
 
 .cache/
