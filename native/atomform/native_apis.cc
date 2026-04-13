@@ -35,6 +35,14 @@ auto GetNativeApiVersion(const Napi::CallbackInfo& info) -> Napi::String {
 
 auto Init(Napi::Env env, Napi::Object exports) -> Napi::Object {
 
+  auto object = Napi::Object::New(env);
+  object.Set(Napi::String::New(env, "SetNodeApi"s), Napi::Function::New(env, SetNodeApi));
+  exports.Set(Napi::String::New(env, "af"s), object);
+
+  object.DefineProperties({
+    Napi::PropertyDescriptor::Function(env, object, "SetNodeApi"s, SetNodeApi),
+  });
+
 #define NATIVE_API(name) exports.Set(Napi::String::New(env, #name), Napi::Function::New(env, name))
   // ---------- real APIs declaration (begin) ----------
 

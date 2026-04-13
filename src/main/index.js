@@ -4,14 +4,10 @@ import { join } from 'path';
 
 const require = createRequire(import.meta.url);
 const CPP_BUILD_TYPE = process.env.DEBUG_NATIVE ? 'Debug' : 'Release';
+const nativeApis = require(join(app.getAppPath(), `build/${CPP_BUILD_TYPE}/addon.node`));
+const nodeApis = require('./node-apis.js');
 
-const addon = require(join(app.getAppPath(), `build/${CPP_BUILD_TYPE}/addon.node`));
-
-function GetNodeApiVersion() {
-  return 'v1.0.0';
-}
-
-addon.SetNodeApi(GetNodeApiVersion);
+nativeApis.SetNodeApi(nodeApis.GetNodeApiVersion);
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -39,7 +35,7 @@ function createWindow() {
   }
 
   mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow.webContents.send('native:message', addon.GetNativeApiVersion());
+    mainWindow.webContents.send('native:message', nativeApis.GetNativeApiVersion());
   });
 
   return mainWindow;

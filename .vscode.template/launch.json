@@ -17,7 +17,6 @@
         "DEBUG_NATIVE": "1",
       },
       "outputCapture": "std",
-      "preLaunchTask": "compile debug native addons",
     },
     {
       "name": "LLDB Attach",

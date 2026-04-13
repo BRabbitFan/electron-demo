@@ -9,10 +9,6 @@
   "main": "src/main/index.js",
   "scripts": {
     "start": "electron .",
-    "compile": "cmake-js compile",
-    "rebuild": "cmake-js rebuild",
-    "compile:debug": "cmake-js compile --debug",
-    "rebuild:debug": "cmake-js rebuild --debug",
     "pack": "electron-builder --dir",
     "dist": "electron-builder"
   },
