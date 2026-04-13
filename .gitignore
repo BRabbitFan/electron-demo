@@ -1,22 +1,3 @@
-# Dependencies
-node_modules/
-yarn.lock
-package-lock.json
-
-# Build output
-dist/
-build/
-out/
-compile_commands.json
-native/build/
-*.node
-
-# Logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
 # OS files
 .DS_Store
 Thumbs.db
@@ -25,9 +6,9 @@ Thumbs.db
 .vscode/*
 .idea/
 
-# Environment variables
-.env
-.env.local
-
 # Electron
 *.tgz
+
+.cache/
+node_modules/
+build/
