@@ -13,11 +13,19 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/bin)
 set(CMAKE_PDB_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/lib)
 
+# opengl
+
+find_package(OpenGL REQUIRED)
+
+# glad
+
+add_subdirectory(native/third_party/glad EXCLUDE_FROM_ALL)
+
 # sdl
 
 add_subdirectory(native/third_party/sdl EXCLUDE_FROM_ALL)
 
-# node_bridge
+# native_apis
 
 execute_process(
   COMMAND node -p "require('node-addon-api').include"
@@ -28,7 +36,7 @@ execute_process(
 
 string(REPLACE "\"" "" NODE_ADDON_API_DIR ${NODE_ADDON_API_DIR})
 
-set(CPP_SOURCE_DIR_PATH ${CMAKE_SOURCE_DIR}/native/node_bridge)
+set(CPP_SOURCE_DIR_PATH ${CMAKE_SOURCE_DIR}/native/native_apis)
 
 file(GLOB_RECURSE CPP_SOURCE_FILE_PATH_LIST
   ${CPP_SOURCE_DIR_PATH}/*.c
@@ -54,6 +62,8 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
   ${CMAKE_JS_LIB}
+  OpenGL::GL
+  GLAD::GLAD
   SDL3::SDL3
 )
 
