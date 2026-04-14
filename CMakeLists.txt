@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
+
 project(native_apis)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -12,6 +13,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/bin)
 set(CMAKE_PDB_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/lib)
 
+# sdl
+
+add_subdirectory(native/third_party/sdl EXCLUDE_FROM_ALL)
+
+# node_bridge
+
 execute_process(
   COMMAND node -p "require('node-addon-api').include"
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -21,7 +28,7 @@ execute_process(
 
 string(REPLACE "\"" "" NODE_ADDON_API_DIR ${NODE_ADDON_API_DIR})
 
-set(CPP_SOURCE_DIR_PATH ${CMAKE_SOURCE_DIR}/native)
+set(CPP_SOURCE_DIR_PATH ${CMAKE_SOURCE_DIR}/native/node_bridge)
 
 file(GLOB_RECURSE CPP_SOURCE_FILE_PATH_LIST
   ${CPP_SOURCE_DIR_PATH}/*.c
@@ -47,6 +54,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
   ${CMAKE_JS_LIB}
+  SDL3::SDL3
 )
 
 if(WIN32)

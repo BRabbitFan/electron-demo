@@ -3,7 +3,8 @@
 #include <napi-inl.h>
 #include <napi.h>
 
-#include <atomform/node_apis.hh>
+#include <SDL3/SDL.h>
+#include <brabbit/node_apis.hh>
 
 using namespace std::literals;
 
