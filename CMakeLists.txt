@@ -13,6 +13,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/bin)
 set(CMAKE_PDB_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/lib)
 
+# The cmake-js set the /DELAYLOAD:node.exe linker flag into CMAKE_SHARED_LINKER_FLAGS on Windows.
+# But clang-cl's toolchain can't handle it, so we need to remove it and add delayimp.lib to the link libraries.
+if(WIN32)
+  link_libraries(delayimp.lib)
+endif()
+
 # opengl
 
 find_package(OpenGL REQUIRED)
