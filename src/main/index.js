@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import { createRequire } from 'module';
 import { join } from 'path';
 
@@ -8,6 +8,8 @@ const require = createRequire(import.meta.url);
 const nativeApis = require(join(app.getAppPath(), 'build/bin/native_apis.node'));
 
 nativeApis.SetNodeApis(...nodeApis);
+
+let renderInterval = null;
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -36,6 +38,34 @@ function createWindow() {
 
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.send('native:message', nativeApis.GetNativeApiVersion());
+  });
+
+  // GL offscreen rendering with PBO readback.
+  ipcMain.handle('gl:create', (_event, width, height) => {
+    return nativeApis.CreateGlRenderer(width, height);
+  });
+
+  ipcMain.handle('gl:render', () => {
+    const pixels = nativeApis.RenderGl();
+    if (!pixels) return null;
+    const size = nativeApis.GetGlRendererSize();
+    return { width: size.width, height: size.height, pixels };
+  });
+
+  ipcMain.handle('gl:resize', (_event, width, height) => {
+    nativeApis.ResizeGlRenderer(width, height);
+  });
+
+  ipcMain.handle('gl:destroy', () => {
+    nativeApis.DestroyGlRenderer();
+  });
+
+  ipcMain.handle('gl:rotate', (_event, dx, dy) => {
+    nativeApis.RotateGlRenderer(dx, dy);
+  });
+
+  mainWindow.on('closed', () => {
+    nativeApis.DestroyGlRenderer();
   });
 
   return mainWindow;

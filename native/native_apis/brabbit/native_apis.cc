@@ -3,12 +3,12 @@
 #include <napi-inl.h>
 #include <napi.h>
 
-#include <glad/glad.h>
-//
-#include <SDL3/SDL.h>
+#include <brabbit/gl_renderer.hh>
 #include <brabbit/node_apis.hh>
 
 using namespace std::literals;
+
+static brabbit::GlRenderer g_renderer;
 
 auto SetNodeApis(const Napi::CallbackInfo& info) -> Napi::Value {
   for (std::size_t index = 0; index < info.Length(); ++index) {
@@ -32,9 +32,69 @@ auto GetNativeApiVersion(const Napi::CallbackInfo& info) -> Napi::String {
   return Napi::String::New(info.Env(), native_version);
 }
 
+// CreateGlRenderer(width, height) -> boolean
+auto CreateGlRenderer(const Napi::CallbackInfo& info) -> Napi::Value {
+  auto env = info.Env();
+  if (info.Length() < 2 || !info[0].IsNumber() || !info[1].IsNumber()) {
+    return Napi::Boolean::New(env, false);
+  }
+  int width = info[0].As<Napi::Number>().Int32Value();
+  int height = info[1].As<Napi::Number>().Int32Value();
+  return Napi::Boolean::New(env, g_renderer.Create(width, height));
+}
+
+// DestroyGlRenderer() -> void
+auto DestroyGlRenderer(const Napi::CallbackInfo& info) -> void {
+  g_renderer.Destroy();
+}
+
+// RenderGl() -> Buffer|null
+// Returns RGBA pixel buffer of the previous frame, or null if not ready.
+auto RenderGl(const Napi::CallbackInfo& info) -> Napi::Value {
+  auto env = info.Env();
+  const uint8_t* pixels = g_renderer.Render();
+  if (!pixels) {
+    return env.Null();
+  }
+  std::size_t size = (std::size_t)g_renderer.width() * g_renderer.height() * 4;
+  // Copy pixels into a JS Buffer (the PBO pointer is only valid until next Render).
+  return Napi::Buffer<uint8_t>::Copy(env, pixels, size);
+}
+
+// ResizeGlRenderer(width, height) -> void
+auto ResizeGlRenderer(const Napi::CallbackInfo& info) -> void {
+  if (info.Length() < 2 || !info[0].IsNumber() || !info[1].IsNumber()) return;
+  int width = info[0].As<Napi::Number>().Int32Value();
+  int height = info[1].As<Napi::Number>().Int32Value();
+  g_renderer.Resize(width, height);
+}
+
+// GetGlRendererSize() -> { width, height }
+auto GetGlRendererSize(const Napi::CallbackInfo& info) -> Napi::Value {
+  auto env = info.Env();
+  auto obj = Napi::Object::New(env);
+  obj.Set("width", g_renderer.width());
+  obj.Set("height", g_renderer.height());
+  return obj;
+}
+
+// RotateGlRenderer(dx, dy) -> void
+auto RotateGlRenderer(const Napi::CallbackInfo& info) -> void {
+  if (info.Length() < 2 || !info[0].IsNumber() || !info[1].IsNumber()) return;
+  float dx = info[0].As<Napi::Number>().FloatValue();
+  float dy = info[1].As<Napi::Number>().FloatValue();
+  g_renderer.Rotate(dx, dy);
+}
+
 auto Init(Napi::Env env, Napi::Object exports) -> Napi::Object {
   exports.Set(Napi::String::New(env, "SetNodeApis"s), Napi::Function::New(env, SetNodeApis));
   exports.Set(Napi::String::New(env, "GetNativeApiVersion"s), Napi::Function::New(env, GetNativeApiVersion));
+  exports.Set(Napi::String::New(env, "CreateGlRenderer"s), Napi::Function::New(env, CreateGlRenderer));
+  exports.Set(Napi::String::New(env, "DestroyGlRenderer"s), Napi::Function::New(env, DestroyGlRenderer));
+  exports.Set(Napi::String::New(env, "RenderGl"s), Napi::Function::New(env, RenderGl));
+  exports.Set(Napi::String::New(env, "ResizeGlRenderer"s), Napi::Function::New(env, ResizeGlRenderer));
+  exports.Set(Napi::String::New(env, "GetGlRendererSize"s), Napi::Function::New(env, GetGlRendererSize));
+  exports.Set(Napi::String::New(env, "RotateGlRenderer"s), Napi::Function::New(env, RotateGlRenderer));
   return exports;
 }
 

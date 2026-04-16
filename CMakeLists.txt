@@ -35,6 +35,10 @@ add_subdirectory(native/glad EXCLUDE_FROM_ALL)
 
 find_package(SDL3 REQUIRED)
 
+# glm
+
+find_package(glm REQUIRED)
+
 # native_apis
 
 execute_process(
@@ -75,6 +79,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   OpenGL::GL
   GLAD::GLAD
   sdl::sdl
+  glm::glm
 )
 
 if(WIN32)
