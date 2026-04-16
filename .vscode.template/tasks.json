@@ -8,7 +8,25 @@
       "command": "pnpm install"
     },
     {
-      "label": "2.1.1. cmake-js configure debug",
+      "label": "2.1. conan install debug",
+      "type": "shell",
+      "problemMatcher": [],
+      "command": "conan install . --output-folder=build/conan --build=missing -s build_type=Debug"
+    },
+    {
+      "label": "2.2. conan install relwithdebinfo",
+      "type": "shell",
+      "problemMatcher": [],
+      "command": "conan install . --output-folder=build/conan --build=missing -s build_type=RelWithDebInfo"
+    },
+    {
+      "label": "2.3. conan install release",
+      "type": "shell",
+      "problemMatcher": [],
+      "command": "conan install . --output-folder=build/conan --build=missing -s build_type=Release"
+    },
+    {
+      "label": "3.1.1. cmake-js configure debug",
       "type": "shell",
       "problemMatcher": [],
       "command": "./node_modules/.bin/cmake-js configure --config=Debug --generator=Ninja --cc=clang --cxx=clang++",
@@ -17,7 +35,7 @@
       }
     },
     {
-      "label": "2.1.2. cmake-js configure relwithdebinfo",
+      "label": "3.1.2. cmake-js configure relwithdebinfo",
       "type": "shell",
       "problemMatcher": [],
       "command": "./node_modules/.bin/cmake-js configure --config=RelWithDebInfo --generator=Ninja --cc=clang --cxx=clang++",
@@ -26,7 +44,7 @@
       }
     },
     {
-      "label": "2.1.3. cmake-js configure release",
+      "label": "3.1.3. cmake-js configure release",
       "type": "shell",
       "problemMatcher": [],
       "command": "./node_modules/.bin/cmake-js configure --config=Release --generator=Ninja --cc=clang --cxx=clang++",
@@ -35,7 +53,7 @@
       }
     },
     {
-      "label": "2.2.1. cmake-js reconfigure debug",
+      "label": "3.2.1. cmake-js reconfigure debug",
       "type": "shell",
       "problemMatcher": [],
       "command": "./node_modules/.bin/cmake-js reconfigure --config=Debug --generator=Ninja --cc=clang --cxx=clang++",
@@ -44,7 +62,7 @@
       }
     },
     {
-      "label": "2.2.2. cmake-js reconfigure relwithdebinfo",
+      "label": "3.2.2. cmake-js reconfigure relwithdebinfo",
       "type": "shell",
       "problemMatcher": [],
       "command": "./node_modules/.bin/cmake-js reconfigure --config=RelWithDebInfo --generator=Ninja --cc=clang --cxx=clang++",
@@ -53,7 +71,7 @@
       }
     },
     {
-      "label": "2.2.3. cmake-js reconfigure release",
+      "label": "3.2.3. cmake-js reconfigure release",
       "type": "shell",
       "problemMatcher": [],
       "command": "./node_modules/.bin/cmake-js reconfigure --config=Release --generator=Ninja --cc=clang --cxx=clang++",
@@ -62,7 +80,7 @@
       }
     },
     {
-      "label": "3. cmake build",
+      "label": "4. cmake build",
       "type": "shell",
       "problemMatcher": [],
       "command": "cmake --build ./build --target all"

@@ -19,17 +19,21 @@ if(WIN32)
   link_libraries(delayimp.lib)
 endif()
 
+# conan
+
+list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/.conan")
+
 # opengl
 
 find_package(OpenGL REQUIRED)
 
 # glad
 
-add_subdirectory(native/third_party/glad EXCLUDE_FROM_ALL)
+add_subdirectory(native/glad EXCLUDE_FROM_ALL)
 
 # sdl
 
-add_subdirectory(native/third_party/sdl EXCLUDE_FROM_ALL)
+find_package(SDL3 REQUIRED)
 
 # native_apis
 
@@ -70,7 +74,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   ${CMAKE_JS_LIB}
   OpenGL::GL
   GLAD::GLAD
-  SDL3::SDL3
+  sdl::sdl
 )
 
 if(WIN32)

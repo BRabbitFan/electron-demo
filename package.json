@@ -8,6 +8,9 @@
   "type": "module",
   "main": "src/main/index.js",
   "scripts": {
+    "conan-install-debug": "conan install . --output-folder=.conan --build=missing -pr:h ./conanprofile.ini -pr:b ./conanprofile.ini -s build_type=Debug",
+    "conan-install-relwithdebuginfo": "conan install . --output-folder=.conan --build=missing -pr:h ./conanprofile.ini -pr:b ./conanprofile.ini -s build_type=RelWithDebInfo",
+    "conan-install-release": "conan install . --output-folder=.conan --build=missing -pr:h ./conanprofile.ini -pr:b ./conanprofile.ini -s build_type=Release",
     "native-configure-debug": "cmake-js configure --config=Debug --generator=Ninja --cc=clang --cxx=clang++",
     "native-configure-relwithdebuginfo": "cmake-js configure --config=RelWithDebInfo --generator=Ninja --cc=clang --cxx=clang++",
     "native-configure-release": "cmake-js configure --config=Release --generator=Ninja --cc=clang --cxx=clang++",

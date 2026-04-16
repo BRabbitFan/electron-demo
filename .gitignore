@@ -11,5 +11,6 @@ dist/
 *.tgz
 
 .cache/
+.conan/
 node_modules/
 build/
