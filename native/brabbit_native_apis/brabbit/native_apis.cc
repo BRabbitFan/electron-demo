@@ -1,6 +1,5 @@
 #include <format>
 
-#include <napi-inl.h>
 #include <napi.h>
 
 #include <brabbit/gl_renderer.hh>

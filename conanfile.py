@@ -7,12 +7,16 @@ class ElectronDemoConan(ConanFile):
   generators = 'CMakeDeps'
 
   def requirements(self):
-    self.requires('sdl/3.4.0')
+    self.requires('boost/1.90.0')
     self.requires('glm/1.0.1')
+    self.requires('nlohmann_json/3.12.0')
+    self.requires('sdl/3.4.0')
 
   def configure(self):
+    self.options['boost/*'].header_only = True
+    self.options['glm/*'].shared = True
+    self.options['nlohmann_json/*'].header_only = True
     self.options['sdl/*'].shared = True
-    self.options['glm/*'].shared = False
 
   def generate(self):
     bindir = path.join(self.generators_folder, 'bin')

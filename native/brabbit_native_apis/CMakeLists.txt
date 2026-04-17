@@ -1,42 +1,26 @@
-set(BRABBIT_PROJECT_NAME "native_apis")
+include(brabbit_cmake_utils)
 
-project("${BRABBIT_VENDOR_NAME}_${BRABBIT_PROJECT_NAME}")
+set(BRABBIT_MODULE_NAME "native_apis")
+brabbit_search_cxx_source_files(BRABBIT_CXX_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR})
 
-find_package(SDL3 REQUIRED)
+project("${BRABBIT_VENDOR_NAME}_${BRABBIT_MODULE_NAME}")
+
+find_package(Boost REQUIRED)
 find_package(glm REQUIRED)
+find_package(nlohmann_json REQUIRED)
+find_package(SDL3 REQUIRED)
 
-execute_process(
-  COMMAND node -p "require('node-addon-api').include"
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-  OUTPUT_VARIABLE NODE_ADDON_API_DIR
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-string(REPLACE "\"" "" NODE_ADDON_API_DIR ${NODE_ADDON_API_DIR})
-
-file(GLOB_RECURSE CPP_SOURCE_FILE_PATH_LIST
-  ${CMAKE_CURRENT_SOURCE_DIR}/*.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/*.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/*.cxx
-)
-
-if(APPLE)
-  file(GLOB_RECURSE OBJCXX_SOURCE_FILE_PATH_LIST ${CMAKE_CURRENT_SOURCE_DIR}/*.mm)
-  list(APPEND CPP_SOURCE_FILE_PATH_LIST ${OBJCXX_SOURCE_FILE_PATH_LIST})
-endif()
-
-add_library(${PROJECT_NAME} SHARED
-  ${CMAKE_JS_SRC}
-  ${CPP_SOURCE_FILE_PATH_LIST}
-)
-
-add_library("${BRABBIT_VENDOR_NAME}::${BRABBIT_PROJECT_NAME}" ALIAS ${PROJECT_NAME})
+add_library(${PROJECT_NAME} SHARED)
+add_library("${BRABBIT_VENDOR_NAME}::${BRABBIT_MODULE_NAME}" ALIAS ${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-  ${NODE_ADDON_API_DIR}
   ${CMAKE_JS_INC}
   ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_sources(${PROJECT_NAME} PRIVATE
+  ${CMAKE_JS_SRC}
+  ${BRABBIT_CXX_SOURCE_FILES}
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
@@ -45,10 +29,15 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
   ${CMAKE_JS_LIB}
+  # system dependencies
   OpenGL::GL
-  glad::glad
-  sdl::sdl
+  # external dependencies
+  boost::boost
   glm::glm
+  nlohmann_json::nlohmann_json
+  sdl::sdl
+  # vendored dependencies
+  glad::glad
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

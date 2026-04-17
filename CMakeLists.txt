@@ -18,25 +18,28 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/bin)
 set(CMAKE_PDB_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/lib)
 
-# The cmake-js set the /DELAYLOAD:node.exe linker flag into CMAKE_SHARED_LINKER_FLAGS on Windows.
-# But clang-cl's toolchain can't handle it, so we need to remove it and add delayimp.lib to the link libraries.
-if(WIN32)
-  link_libraries(delayimp.lib)
-endif()
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/conan_packages)
+
+include(brabbit_cmake_utils)
+brabbit_setup_electron_environment()
 
 # system dependencies
 
 find_package(OpenGL REQUIRED)
 
-# package dependencies
+# external dependencies
 
-list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/conan_packages")
 include(${CMAKE_SOURCE_DIR}/conan_packages/conandeps_legacy.cmake)
+find_package(Boost REQUIRED)  # libraries: boost::boost
+find_package(glm REQUIRED)  # libraries: glm::glm
+find_package(nlohmann_json REQUIRED)  # libraries: nlohmann_json::nlohmann_json
+find_package(SDL3 REQUIRED)  # libraries: sdl::sdl
 
-# build-in dependencies
+# vendored dependencies
 
 add_subdirectory(native/glad EXCLUDE_FROM_ALL)
 
-# source code of project
+# project targets
 
 add_subdirectory(native/brabbit_native_apis)

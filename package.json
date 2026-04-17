@@ -90,6 +90,9 @@
     "node-addon-api": "^8.7.0"
   },
   "dependencies": {},
+  "binary": {
+    "napi_versions": [10]
+  },
   "cmake-js": {
     "runtime": "electron",
     "runtimeVersion": "41.2.0"
