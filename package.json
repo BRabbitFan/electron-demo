@@ -8,9 +8,9 @@
   "type": "module",
   "main": "src/main/index.js",
   "scripts": {
-    "conan-install-debug": "conan install . --output-folder=.conan --build=missing -pr:h ./conanprofile.ini -pr:b ./conanprofile.ini -s build_type=Debug",
-    "conan-install-relwithdebuginfo": "conan install . --output-folder=.conan --build=missing -pr:h ./conanprofile.ini -pr:b ./conanprofile.ini -s build_type=RelWithDebInfo",
-    "conan-install-release": "conan install . --output-folder=.conan --build=missing -pr:h ./conanprofile.ini -pr:b ./conanprofile.ini -s build_type=Release",
+    "conan-install-debug": "conan install . --output-folder=./conan_packages -pr:a ./conanprofile.ini --build=missing -s build_type=Debug",
+    "conan-install-relwithdebuginfo": "conan install . --output-folder=./conan_packages -pr:a ./conanprofile.ini --build=missing -s build_type=RelWithDebInfo",
+    "conan-install-release": "conan install . --output-folder=./conan_packages -pr:a ./conanprofile.ini --build=missing -s build_type=Release",
     "native-configure-debug": "cmake-js configure --config=Debug --generator=Ninja --cc=clang --cxx=clang++",
     "native-configure-relwithdebuginfo": "cmake-js configure --config=RelWithDebInfo --generator=Ninja --cc=clang --cxx=clang++",
     "native-configure-release": "cmake-js configure --config=Release --generator=Ninja --cc=clang --cxx=clang++",
@@ -31,6 +31,9 @@
   "build": {
     "appId": "xyz.brabbit.electrondemo",
     "productName": "ElectronDemo",
+    "directories": {
+      "output": "dist"
+    },
     "files": [
       "src/**/*",
       "build/bin/*.node"
@@ -38,6 +41,15 @@
     "extraFiles": [
       {
         "from": "build/bin/",
+        "to": ".",
+        "filter": [
+          "*.so",
+          "*.dylib",
+          "*.dll"
+        ]
+      },
+      {
+        "from": "conan_packages/bin/",
         "to": ".",
         "filter": [
           "*.so",

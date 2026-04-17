@@ -11,19 +11,19 @@
       "label": "2.1. conan install debug",
       "type": "shell",
       "problemMatcher": [],
-      "command": "conan install . --output-folder=build/conan --build=missing -s build_type=Debug"
+      "command": "conan install . --output-folder=./conan_packages --build=missing -pr:a ./conanprofile.ini -s build_type=Debug"
     },
     {
       "label": "2.2. conan install relwithdebinfo",
       "type": "shell",
       "problemMatcher": [],
-      "command": "conan install . --output-folder=build/conan --build=missing -s build_type=RelWithDebInfo"
+      "command": "conan install . --output-folder=./conan_packages --build=missing -pr:a ./conanprofile.ini -s build_type=RelWithDebInfo"
     },
     {
       "label": "2.3. conan install release",
       "type": "shell",
       "problemMatcher": [],
-      "command": "conan install . --output-folder=build/conan --build=missing -s build_type=Release"
+      "command": "conan install . --output-folder=./conan_packages --build=missing -pr:a ./conanprofile.ini -s build_type=Release"
     },
     {
       "label": "3.1.1. cmake-js configure debug",

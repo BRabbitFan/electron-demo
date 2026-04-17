@@ -1,0 +1,57 @@
+set(BRABBIT_PROJECT_NAME "native_apis")
+
+project("${BRABBIT_VENDOR_NAME}_${BRABBIT_PROJECT_NAME}")
+
+find_package(SDL3 REQUIRED)
+find_package(glm REQUIRED)
+
+execute_process(
+  COMMAND node -p "require('node-addon-api').include"
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  OUTPUT_VARIABLE NODE_ADDON_API_DIR
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+string(REPLACE "\"" "" NODE_ADDON_API_DIR ${NODE_ADDON_API_DIR})
+
+file(GLOB_RECURSE CPP_SOURCE_FILE_PATH_LIST
+  ${CMAKE_CURRENT_SOURCE_DIR}/*.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/*.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/*.cxx
+)
+
+if(APPLE)
+  file(GLOB_RECURSE OBJCXX_SOURCE_FILE_PATH_LIST ${CMAKE_CURRENT_SOURCE_DIR}/*.mm)
+  list(APPEND CPP_SOURCE_FILE_PATH_LIST ${OBJCXX_SOURCE_FILE_PATH_LIST})
+endif()
+
+add_library(${PROJECT_NAME} SHARED
+  ${CMAKE_JS_SRC}
+  ${CPP_SOURCE_FILE_PATH_LIST}
+)
+
+add_library("${BRABBIT_VENDOR_NAME}::${BRABBIT_PROJECT_NAME}" ALIAS ${PROJECT_NAME})
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+  ${NODE_ADDON_API_DIR}
+  ${CMAKE_JS_INC}
+  ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+  NAPI_DISABLE_CPP_EXCEPTIONS
+)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
+  ${CMAKE_JS_LIB}
+  OpenGL::GL
+  glad::glad
+  sdl::sdl
+  glm::glm
+)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+  PREFIX ""
+  SUFFIX ".node"
+)

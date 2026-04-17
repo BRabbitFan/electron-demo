@@ -5,7 +5,7 @@ import { join } from 'path';
 import { nodeApis } from './node-apis.js';
 
 const require = createRequire(import.meta.url);
-const nativeApis = require(join(app.getAppPath(), 'build/bin/native_apis.node'));
+const nativeApis = require(join(app.getAppPath(), 'build/bin/brabbit_native_apis.node'));
 
 nativeApis.SetNodeApis(...nodeApis);
 

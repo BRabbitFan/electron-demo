@@ -1,16 +1,17 @@
-# OS
+# OS specific files
 .DS_Store
 Thumbs.db
 
-# IDE
-.vscode/*
+# IDE/Editor configuration directories
+.vscode/
 .idea/
 
-# Electron
-dist/
-*.tgz
+# general temp/cache files
+**/.temp/
+**/.cache/
 
-.cache/
-.conan/
+# build artifacts
+conan_packages/
 node_modules/
 build/
+dist/
