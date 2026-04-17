@@ -26,9 +26,9 @@ brabbit_setup_electron_environment()
 
 # system dependencies
 
-find_package(OpenGL REQUIRED)
+find_package(OpenGL REQUIRED)  # libraries: OpenGL::GL
 
-# external dependencies
+# conan dependencies
 
 include(${CMAKE_SOURCE_DIR}/conan_packages/conandeps_legacy.cmake)
 find_package(Boost REQUIRED)  # libraries: boost::boost
@@ -36,10 +36,10 @@ find_package(glm REQUIRED)  # libraries: glm::glm
 find_package(nlohmann_json REQUIRED)  # libraries: nlohmann_json::nlohmann_json
 find_package(SDL3 REQUIRED)  # libraries: sdl::sdl
 
-# vendored dependencies
+# source code dependencies
 
-add_subdirectory(native/glad EXCLUDE_FROM_ALL)
+add_subdirectory(native/glad EXCLUDE_FROM_ALL)  # libraries: glad::glad
 
 # project targets
 
-add_subdirectory(native/brabbit_native_apis)
+add_subdirectory(native/brabbit_native_apis)  # libraries: brabbit::native_apis

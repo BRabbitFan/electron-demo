@@ -1,25 +1,24 @@
-include(brabbit_cmake_utils)
-
 set(BRABBIT_MODULE_NAME "native_apis")
-brabbit_search_cxx_source_files(BRABBIT_CXX_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR})
 
 project("${BRABBIT_VENDOR_NAME}_${BRABBIT_MODULE_NAME}")
-
-find_package(Boost REQUIRED)
-find_package(glm REQUIRED)
-find_package(nlohmann_json REQUIRED)
-find_package(SDL3 REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED)
 add_library("${BRABBIT_VENDOR_NAME}::${BRABBIT_MODULE_NAME}" ALIAS ${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME} PRIVATE
+  # electron environment
   ${CMAKE_JS_INC}
+
+  # library source code
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+brabbit_search_cxx_source_files(BRABBIT_CXX_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR})
 target_sources(${PROJECT_NAME} PRIVATE
+  # electron environment
   ${CMAKE_JS_SRC}
+
+  # library source code
   ${BRABBIT_CXX_SOURCE_FILES}
 )
 
@@ -28,15 +27,19 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
+  # electron environment
   ${CMAKE_JS_LIB}
+
   # system dependencies
   OpenGL::GL
-  # external dependencies
+
+  # conan dependencies
   boost::boost
   glm::glm
   nlohmann_json::nlohmann_json
   sdl::sdl
-  # vendored dependencies
+
+  # source code dependencies
   glad::glad
 )
 
