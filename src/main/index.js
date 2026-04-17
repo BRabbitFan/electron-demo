@@ -1,7 +1,6 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import { createRequire } from 'module';
 import { join } from 'path';
-import { cmake } from 'cmake-js';
 
 import { nodeApis } from './node-apis.js';
 
