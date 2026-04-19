@@ -9,8 +9,6 @@ const nativeApis = require(join(app.getAppPath(), 'build/bin/brabbit_native_apis
 
 nativeApis.SetNodeApis(...nodeApis);
 
-let renderInterval = null;
-
 function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 800,
