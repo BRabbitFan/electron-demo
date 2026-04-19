@@ -6,4 +6,4 @@ const nodeApis = [
   GetNodeApiVersion,
 ];
 
-export { nodeApis };
+module.exports = { nodeApis };

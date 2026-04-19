@@ -1,12 +1,26 @@
-const { contextBridge, ipcRenderer } = require('electron');
+const { join } = require('path');
+const { contextBridge } = require('electron');
 
-contextBridge.exposeInMainWorld('api', {
-  onMessage: (callback) => {
-    ipcRenderer.on('native:message', (_, message) => callback(message));
+const nativeApis = require('bindings')('bin/brabbit_native_apis.node');
+const { nodeApis } = require('./node-apis.cjs');
+
+nativeApis.SetNodeApis(...nodeApis);
+
+// Expose to isolated renderer context. Same OS process — no IPC.
+contextBridge.exposeInMainWorld('nativeApis', {
+  GetNativeApiVersion: () => nativeApis.GetNativeApiVersion(),
+  CreateGlRenderer: (w, h) => nativeApis.CreateGlRenderer(w, h),
+  DestroyGlRenderer: () => nativeApis.DestroyGlRenderer(),
+  RenderGl: () => {
+    const buf = nativeApis.RenderGl();
+    if (!buf) return null;
+    // Return a plain ArrayBuffer so contextBridge can structured-clone it (same-process memcpy).
+    return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
   },
-  glCreate: (width, height) => ipcRenderer.invoke('gl:create', width, height),
-  glRender: () => ipcRenderer.invoke('gl:render'),
-  glResize: (width, height) => ipcRenderer.invoke('gl:resize', width, height),
-  glRotate: (dx, dy) => ipcRenderer.invoke('gl:rotate', dx, dy),
-  glDestroy: () => ipcRenderer.invoke('gl:destroy'),
+  GetGlRendererSize: () => {
+    const s = nativeApis.GetGlRendererSize();
+    return { width: s.width, height: s.height };
+  },
+  ResizeGlRenderer: (w, h) => nativeApis.ResizeGlRenderer(w, h),
+  RotateGlRenderer: (dx, dy) => nativeApis.RotateGlRenderer(dx, dy),
 });
