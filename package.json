@@ -40,15 +40,6 @@
     ],
     "extraFiles": [
       {
-        "from": "build/bin/",
-        "to": ".",
-        "filter": [
-          "*.so",
-          "*.dylib",
-          "*.dll"
-        ]
-      },
-      {
         "from": "conan_packages/bin/",
         "to": ".",
         "filter": [
@@ -73,6 +64,26 @@
       ]
     },
     "win": {
+      "extraFiles": [
+        {
+          "from": "build/bin/",
+          "to": ".",
+          "filter": [
+            "*.so",
+            "*.dylib",
+            "*.dll"
+          ]
+        },
+        {
+          "from": "conan_packages/bin/",
+          "to": ".",
+          "filter": [
+            "*.so",
+            "*.dylib",
+            "*.dll"
+          ]
+        }
+      ],
       "target": [
         "nsis",
         "zip"
@@ -83,13 +94,15 @@
       "allowToChangeInstallationDirectory": true
     }
   },
+  "dependencies": {
+    "bindings": "^1.5.0"
+  },
   "devDependencies": {
     "cmake-js": "^8.0.0",
     "electron": "^41.2.0",
     "electron-builder": "^26.8.2",
     "node-addon-api": "^8.7.0"
   },
-  "dependencies": {},
   "binary": {
     "napi_versions": [10]
   },
