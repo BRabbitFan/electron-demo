@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.28)
 
+cmake_policy(SET CMP0167 NEW)  # use XxxConfig.cmake insead of FindXxx.cmake when find_package is called
+
 set(BRABBIT_VENDOR_NAME "brabbit")
 set(BRABBIT_PROJECT_NAME "nodejs_native_addons")
 
@@ -23,6 +25,7 @@ list(APPEND CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/conan_packages)
 
 include(brabbit_cmake_utils)
 brabbit_setup_electron_environment()
+brabbit_copy_conan_packages_to_output_directory()
 
 # system dependencies
 

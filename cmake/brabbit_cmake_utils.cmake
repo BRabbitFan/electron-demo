@@ -34,6 +34,8 @@ function(brabbit_search_cxx_source_files source_files source_dirs)
   set(${source_files} ${files} PARENT_SCOPE)
 endfunction()
 
+
+
 #[[
   .brief Auto set up the Electron build environment.
   .detail Auto set up the CMake environment for electron without using cmake-js to configure,
@@ -53,43 +55,54 @@ function(brabbit_setup_electron_environment)
     set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreaded$<$<CONFIG:Debug>:Debug> PARENT_SCOPE)
     message(STATUS "[brabbit] Setting CMAKE_MSVC_RUNTIME_LIBRARY to 'MultiThreaded$<$<CONFIG:Debug>:Debug>' for Windows")
 
-    # The cmake-js set the /DELAYLOAD:node.exe linker flag into CMAKE_SHARED_LINKER_FLAGS on Windows.
-    # But clang-cl's toolchain can't handle it, so we need to remove it and add delayimp.lib to the link libraries.
+    if(NOT DEFINED CMAKE_SHARED_LINKER_FLAGS OR CMAKE_SHARED_LINKER_FLAGS STREQUAL "")
+      set(CMAKE_SHARED_LINKER_FLAGS "/DELAYLOAD:NODE.EXE" PARENT_SCOPE)
+      message(STATUS "[brabbit] Setting CMAKE_SHARED_LINKER_FLAGS to '/DELAYLOAD:NODE.EXE' for Windows")
+    elseif(NOT CMAKE_SHARED_LINKER_FLAGS MATCHES "/DELAYLOAD:NODE.EXE")
+      string(APPEND CMAKE_SHARED_LINKER_FLAGS " /DELAYLOAD:NODE.EXE")
+      set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}" PARENT_SCOPE)
+      message(STATUS "[brabbit] Appending '/DELAYLOAD:NODE.EXE' to CMAKE_SHARED_LINKER_FLAGS, now it is '${CMAKE_SHARED_LINKER_FLAGS}'")
+    endif()
+
+    # The cmake-js set the /DELAYLOAD:NODE.EXE linker flag into CMAKE_SHARED_LINKER_FLAGS on Windows.
+    # But clang-cl's toolchain can't handle it, so we need to add delayimp.lib to the link libraries manually.
     link_libraries(delayimp.lib)
     message(STATUS "[brabbit] Adding 'delayimp.lib' to link libraries for Windows")
   endif()
 
-  set(_pnpm_dir "${CMAKE_SOURCE_DIR}/node_modules/.pnpm")
+  set(pnpm_dir "${CMAKE_SOURCE_DIR}/node_modules/.pnpm")
 
   # CMAKE_JS_INC: node-api-headers + node-addon-api include paths
   if(NOT DEFINED CMAKE_JS_INC)
-    file(GLOB _NAPI_HEADERS_DIR "${_pnpm_dir}/node-api-headers@*/node_modules/node-api-headers/include")
-    file(GLOB _NAPI_ADDON_DIR "${_pnpm_dir}/node-addon-api@*/node_modules/node-addon-api")
-    set(CMAKE_JS_INC ${_NAPI_HEADERS_DIR} ${_NAPI_ADDON_DIR} PARENT_SCOPE)
-    message(STATUS "[brabbit] Setting CMAKE_JS_INC to '${_NAPI_HEADERS_DIR};${_NAPI_ADDON_DIR}'")
+    file(GLOB napi_headers_dir "${pnpm_dir}/node-api-headers@*/node_modules/node-api-headers/include")
+    file(GLOB napi_addon_dir "${pnpm_dir}/node-addon-api@*/node_modules/node-addon-api")
+    set(CMAKE_JS_INC ${napi_headers_dir} ${napi_addon_dir} PARENT_SCOPE)
+    message(STATUS "[brabbit] Setting CMAKE_JS_INC to '${napi_headers_dir};${napi_addon_dir}'")
   endif()
 
   # CMAKE_JS_SRC: delay-load hook source on Windows
   if(NOT DEFINED CMAKE_JS_SRC)
     if(WIN32)
-      file(GLOB _CMAKEJS_SRC "${_pnpm_dir}/cmake-js@*/node_modules/cmake-js/lib/cpp/win_delay_load_hook.cc")
-      set(CMAKE_JS_SRC ${_CMAKEJS_SRC} PARENT_SCOPE)
+      file(GLOB cmakejs_src "${pnpm_dir}/cmake-js@*/node_modules/cmake-js/lib/cpp/win_delay_load_hook.cc")
+      set(CMAKE_JS_SRC ${cmakejs_src} PARENT_SCOPE)
     else()
       set(CMAKE_JS_SRC "" PARENT_SCOPE)
     endif()
-    message(STATUS "[brabbit] Setting CMAKE_JS_SRC to '${_CMAKEJS_SRC}'")
+    message(STATUS "[brabbit] Setting CMAKE_JS_SRC to '${cmakejs_src}'")
   endif()
 
   # CMAKE_JS_LIB: node.lib on Windows
   if(NOT DEFINED CMAKE_JS_LIB)
     if(WIN32)
-      file(GLOB _CMAKE_JS_NODELIB_DEF "${_pnpm_dir}/node-api-headers@*/node_modules/node-api-headers/def/node_api.def")
-      set(CMAKE_JS_LIB ${CMAKE_SOURCE_DIR}/build/node.lib PARENT_SCOPE)
-      set(CMAKE_JS_NODELIB_DEF ${_CMAKE_JS_NODELIB_DEF} PARENT_SCOPE)
-      set(CMAKE_JS_NODELIB_TARGET ${CMAKE_SOURCE_DIR}/build/node.lib PARENT_SCOPE)
-      message(STATUS "[brabbit] Setting CMAKE_JS_LIB to '${CMAKE_JS_LIB}'")
-      message(STATUS "[brabbit] Setting CMAKE_JS_NODELIB_DEF to '${CMAKE_JS_NODELIB_DEF}'")
-      message(STATUS "[brabbit] Setting CMAKE_JS_NODELIB_TARGET to '${CMAKE_JS_NODELIB_TARGET}'")
+      set(cmake_js_lib "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/node.lib")
+      file(GLOB cmake_js_nodelib_def "${pnpm_dir}/node-api-headers@*/node_modules/node-api-headers/def/node_api.def")
+      set(cmake_js_nodelib_target "${cmake_js_lib}")
+      set(CMAKE_JS_LIB ${cmake_js_lib} PARENT_SCOPE)
+      set(CMAKE_JS_NODELIB_DEF ${cmake_js_nodelib_def} PARENT_SCOPE)
+      set(CMAKE_JS_NODELIB_TARGET ${cmake_js_nodelib_target} PARENT_SCOPE)
+      message(STATUS "[brabbit] Setting CMAKE_JS_LIB to '${cmake_js_lib}'")
+      message(STATUS "[brabbit] Setting CMAKE_JS_NODELIB_DEF to '${cmake_js_nodelib_def}'")
+      message(STATUS "[brabbit] Setting CMAKE_JS_NODELIB_TARGET to '${cmake_js_nodelib_target}'")
     else()
       set(CMAKE_JS_LIB "" PARENT_SCOPE)
       message(STATUS "[brabbit] Setting CMAKE_JS_LIB to ''")
@@ -124,5 +137,54 @@ function(brabbit_setup_electron_environment)
     string(JSON cmakejs_runtime_version GET ${package_json} "cmake-js" "runtimeVersion")
     set(NODE_RUNTIMEVERSION ${cmakejs_runtime_version} PARENT_SCOPE)
     message(STATUS "[brabbit] Setting NODE_RUNTIMEVERSION to '${cmakejs_runtime_version}' from package.json -> cmake-js -> runtimeVersion")
+  endif()
+
+  # Generate node.lib from .def file on Windows (cmake-js v8 Node-API mode requires this)
+  if(WIN32)
+    if(CMAKE_JS_NODELIB_DEF AND CMAKE_JS_NODELIB_TARGET)
+      set(nodelib_def "${CMAKE_JS_NODELIB_DEF}")
+      set(nodelib_out "${CMAKE_JS_NODELIB_TARGET}")
+    elseif(cmake_js_nodelib_def AND cmake_js_nodelib_target)
+      set(nodelib_def "${cmake_js_nodelib_def}")
+      set(nodelib_out "${cmake_js_nodelib_target}")
+    endif()
+
+    if(nodelib_def AND nodelib_out AND NOT EXISTS "${nodelib_out}")
+      message(STATUS "[brabbit] Generating node.lib from '${nodelib_def}' to '${nodelib_out}' using ${CMAKE_AR}")
+
+      get_filename_component(nodelib_out_dir "${nodelib_out}" DIRECTORY)
+      file(MAKE_DIRECTORY "${nodelib_out_dir}")
+      execute_process(
+        COMMAND ${CMAKE_AR} /def:${nodelib_def} /out:${nodelib_out} /machine:${CMAKE_SYSTEM_PROCESSOR}
+        RESULT_VARIABLE nodelib_result
+      )
+
+      if(NOT nodelib_result EQUAL 0)
+        message(WARNING "[brabbit] Failed to generate node.lib (exit code: ${nodelib_result})")
+      else()
+        message(STATUS "[brabbit] Generated node.lib at '${nodelib_out}'")
+      endif()
+
+    endif()
+  endif()
+endfunction()
+
+
+
+#[[
+  .brief Copy dependent shared libraries from conan_packages to output directory on Windows.
+]]#
+function(brabbit_copy_conan_packages_to_output_directory)
+  if(NOT WIN32)
+    return()
+  endif()
+
+  set(from_dir "${CMAKE_SOURCE_DIR}/conan_packages/bin")
+  set(to_dir "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
+  file(GLOB conan_dlls "${from_dir}/*.dll")
+  if(conan_dlls)
+    file(COPY ${conan_dlls} DESTINATION "${to_dir}")
+    message(STATUS "[brabbit] Copied conan DLLs from '${from_dir}' to '${to_dir}'")
   endif()
 endfunction()
