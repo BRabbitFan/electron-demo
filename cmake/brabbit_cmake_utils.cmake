@@ -53,9 +53,9 @@ function(brabbit_setup_electron_environment)
     set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreaded$<$<CONFIG:Debug>:Debug> PARENT_SCOPE)
     message(STATUS "[brabbit] Setting CMAKE_MSVC_RUNTIME_LIBRARY to 'MultiThreaded$<$<CONFIG:Debug>:Debug>' for Windows")
 
-    if(NOT DEFINED CMAKE_SHARED_LINKER_FLAGS OR CMAKE_SHARED_LINKER_FLAGS STREQUAL "")
-      set(CMAKE_SHARED_LINKER_FLAGS "/DELAYLOAD:NODE.EXE" PARENT_SCOPE)
-      message(STATUS "[brabbit] Setting CMAKE_SHARED_LINKER_FLAGS to '/DELAYLOAD:NODE.EXE' for Windows")
+    if(NOT CMAKE_SHARED_LINKER_FLAGS MATCHES "DELAYLOAD")
+      set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /DELAYLOAD:NODE.EXE" PARENT_SCOPE)
+      message(STATUS "[brabbit] Appended '/DELAYLOAD:NODE.EXE' to CMAKE_SHARED_LINKER_FLAGS for Windows")
     endif()
 
     # The cmake-js set the /DELAYLOAD:NODE.EXE linker flag into CMAKE_SHARED_LINKER_FLAGS on Windows.
