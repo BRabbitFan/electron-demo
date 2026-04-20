@@ -8,6 +8,7 @@
   "type": "module",
   "main": "src/main/index.js",
   "scripts": {
+    "pnpm-install-prune": "pnpm install && pnpm prune",
     "conan-install-debug": "conan install . --output-folder=./conan_packages -pr:a ./conanprofile.ini --build=missing -s build_type=Debug",
     "conan-install-relwithdebuginfo": "conan install . --output-folder=./conan_packages -pr:a ./conanprofile.ini --build=missing -s build_type=RelWithDebInfo",
     "conan-install-release": "conan install . --output-folder=./conan_packages -pr:a ./conanprofile.ini --build=missing -s build_type=Release",
