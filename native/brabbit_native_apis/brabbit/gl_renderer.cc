@@ -1,16 +1,17 @@
-#include <brabbit/gl_renderer.hh>
+#include <string_view>
 
 #include <glad/glad.h>
 //
 #include <SDL3/SDL.h>
 
+#include <brabbit/gl_renderer.hh>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 namespace brabbit {
 
-static const char* kVertexShaderSource = R"glsl(
+constexpr std::string_view kVertexShaderSource = R"glsl(
 #version 410 core
 layout(location = 0) in vec3 aPosition;
 layout(location = 1) in vec3 aColor;
@@ -22,7 +23,7 @@ void main() {
 }
 )glsl";
 
-static const char* kFragmentShaderSource = R"glsl(
+constexpr std::string_view kFragmentShaderSource = R"glsl(
 #version 410 core
 in vec3 vColor;
 out vec4 fragColor;
@@ -166,8 +167,8 @@ bool GlRenderer::Create(int width, int height) {
     return shader;
   };
 
-  GLuint vs = compile_shader(GL_VERTEX_SHADER, kVertexShaderSource);
-  GLuint fs = compile_shader(GL_FRAGMENT_SHADER, kFragmentShaderSource);
+  GLuint vs = compile_shader(GL_VERTEX_SHADER, kVertexShaderSource.data());
+  GLuint fs = compile_shader(GL_FRAGMENT_SHADER, kFragmentShaderSource.data());
   if (!vs || !fs) { Destroy(); return false; }
 
   shader_program_ = glCreateProgram();
