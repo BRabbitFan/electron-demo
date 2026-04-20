@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.28)
 
-cmake_policy(SET CMP0167 NEW)  # use XxxConfig.cmake insead of FindXxx.cmake when find_package is called
+if(POLICY CMP0167)
+  cmake_policy(SET CMP0167 NEW)  # use XxxConfig.cmake instead of FindXxx.cmake when find_package is called
+endif()
 
 set(BRABBIT_VENDOR_NAME "brabbit")
 set(BRABBIT_PROJECT_NAME "nodejs_native_addons")
