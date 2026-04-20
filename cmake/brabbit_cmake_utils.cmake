@@ -42,15 +42,13 @@ endfunction()
           and skip the evironment setup if the relevant variables are already defined (e.g. by cmake-js).
 ]]#
 function(brabbit_setup_electron_environment)
+  # CMAKE_CXX_FLAGS
   if(NOT DEFINED CMAKE_CXX_FLAGS OR CMAKE_CXX_FLAGS STREQUAL "")
     set(CMAKE_CXX_FLAGS "-DBUILDING_NODE_EXTENSION" PARENT_SCOPE)
     message(STATUS "[brabbit] Setting CMAKE_CXX_FLAGS to '-DBUILDING_NODE_EXTENSION'")
-  elseif(NOT CMAKE_CXX_FLAGS MATCHES "-DBUILDING_NODE_EXTENSION")
-    string(APPEND CMAKE_CXX_FLAGS " -DBUILDING_NODE_EXTENSION")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" PARENT_SCOPE)
-    message(STATUS "[brabbit] Appending '-DBUILDING_NODE_EXTENSION' to CMAKE_CXX_FLAGS, now it is '${CMAKE_CXX_FLAGS}'")
   endif()
 
+  # CMAKE_SHARED_LINKER_FLAGS and platform-specific settings for link
   if(WIN32)
     set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreaded$<$<CONFIG:Debug>:Debug> PARENT_SCOPE)
     message(STATUS "[brabbit] Setting CMAKE_MSVC_RUNTIME_LIBRARY to 'MultiThreaded$<$<CONFIG:Debug>:Debug>' for Windows")
@@ -58,16 +56,20 @@ function(brabbit_setup_electron_environment)
     if(NOT DEFINED CMAKE_SHARED_LINKER_FLAGS OR CMAKE_SHARED_LINKER_FLAGS STREQUAL "")
       set(CMAKE_SHARED_LINKER_FLAGS "/DELAYLOAD:NODE.EXE" PARENT_SCOPE)
       message(STATUS "[brabbit] Setting CMAKE_SHARED_LINKER_FLAGS to '/DELAYLOAD:NODE.EXE' for Windows")
-    elseif(NOT CMAKE_SHARED_LINKER_FLAGS MATCHES "/DELAYLOAD:NODE.EXE")
-      string(APPEND CMAKE_SHARED_LINKER_FLAGS " /DELAYLOAD:NODE.EXE")
-      set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}" PARENT_SCOPE)
-      message(STATUS "[brabbit] Appending '/DELAYLOAD:NODE.EXE' to CMAKE_SHARED_LINKER_FLAGS, now it is '${CMAKE_SHARED_LINKER_FLAGS}'")
     endif()
 
     # The cmake-js set the /DELAYLOAD:NODE.EXE linker flag into CMAKE_SHARED_LINKER_FLAGS on Windows.
     # But clang-cl's toolchain can't handle it, so we need to add delayimp.lib to the link libraries manually.
     link_libraries(delayimp.lib)
     message(STATUS "[brabbit] Adding 'delayimp.lib' to link libraries for Windows")
+
+  elseif(APPLE)
+    set(CMAKE_OSX_ARCHITECTURES "${CMAKE_SYSTEM_PROCESSOR}" PARENT_SCOPE)
+
+    if(NOT CMAKE_SHARED_LINKER_FLAGS MATCHES "-undefined dynamic_lookup")
+      set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup" PARENT_SCOPE)
+      message(STATUS "[brabbit] Appended '-undefined dynamic_lookup' to CMAKE_SHARED_LINKER_FLAGS for macOS")
+    endif()
   endif()
 
   set(pnpm_dir "${CMAKE_SOURCE_DIR}/node_modules/.pnpm")
@@ -114,7 +116,7 @@ function(brabbit_setup_electron_environment)
     set(node_arch)
     if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64")
       set(node_arch "x64")
-    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|ARM64")
+    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64")
       set(node_arch "arm64")
     else()
       message(FATAL_ERROR "Unsupported NODE_ARCH: ${CMAKE_SYSTEM_PROCESSOR}")
