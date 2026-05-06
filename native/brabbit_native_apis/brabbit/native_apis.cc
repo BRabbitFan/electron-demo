@@ -39,23 +39,23 @@ auto CreateGlRenderer(const Napi::CallbackInfo& info) -> Napi::Value {
   }
   int width = info[0].As<Napi::Number>().Int32Value();
   int height = info[1].As<Napi::Number>().Int32Value();
-  return Napi::Boolean::New(env, g_renderer.Create(width, height));
+  return Napi::Boolean::New(env, g_renderer.create(width, height));
 }
 
 // DestroyGlRenderer() -> void
 auto DestroyGlRenderer(const Napi::CallbackInfo& info) -> void {
-  g_renderer.Destroy();
+  g_renderer.destroy();
 }
 
 // RenderGl() -> Buffer|null
 // Returns RGBA pixel buffer of the previous frame, or null if not ready.
 auto RenderGl(const Napi::CallbackInfo& info) -> Napi::Value {
   auto env = info.Env();
-  const uint8_t* pixels = g_renderer.Render();
+  const uint8_t* pixels = g_renderer.render();
   if (!pixels) {
     return env.Null();
   }
-  std::size_t size = (std::size_t)g_renderer.width() * g_renderer.height() * 4;
+  std::size_t size = (std::size_t)g_renderer.getWidth() * g_renderer.getHeight() * 4;
   // Copy pixels into a JS Buffer (the PBO pointer is only valid until next Render).
   return Napi::Buffer<uint8_t>::Copy(env, pixels, size);
 }
@@ -65,15 +65,15 @@ auto ResizeGlRenderer(const Napi::CallbackInfo& info) -> void {
   if (info.Length() < 2 || !info[0].IsNumber() || !info[1].IsNumber()) return;
   int width = info[0].As<Napi::Number>().Int32Value();
   int height = info[1].As<Napi::Number>().Int32Value();
-  g_renderer.Resize(width, height);
+  g_renderer.resize(width, height);
 }
 
 // GetGlRendererSize() -> { width, height }
 auto GetGlRendererSize(const Napi::CallbackInfo& info) -> Napi::Value {
   auto env = info.Env();
   auto obj = Napi::Object::New(env);
-  obj.Set("width", g_renderer.width());
-  obj.Set("height", g_renderer.height());
+  obj.Set("width", g_renderer.getWidth());
+  obj.Set("height", g_renderer.getHeight());
   return obj;
 }
 
@@ -82,7 +82,7 @@ auto RotateGlRenderer(const Napi::CallbackInfo& info) -> void {
   if (info.Length() < 2 || !info[0].IsNumber() || !info[1].IsNumber()) return;
   float dx = info[0].As<Napi::Number>().FloatValue();
   float dy = info[1].As<Napi::Number>().FloatValue();
-  g_renderer.Rotate(dx, dy);
+  g_renderer.rotate(dx, dy);
 }
 
 auto Init(Napi::Env env, Napi::Object exports) -> Napi::Object {
